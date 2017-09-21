@@ -3,9 +3,12 @@
 
 ### 当没有配置的时候使用当前应用的端口
 
+### 使用方式, 在当前项目中添加如下依赖即可
 
-系统启动时自动取当前应用的端口, 如需自定义, 使用如下配置
-
-minlia:
-    cross:
-        port: 7001
+```
+    <dependency>
+      <groupId>com.minlia.cross</groupId>
+      <artifactId>minlia-cross</artifactId>
+      <version>1.0.2.RELEASE</version>
+    </dependency>
+```
