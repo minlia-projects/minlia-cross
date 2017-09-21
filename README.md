@@ -9,6 +9,11 @@
       <version>1.0.2.RELEASE</version>
     </dependency>
 ```
+### 运行效果
+
+![Startup](https://raw.githubusercontent.com/minlia-projects/minlia-cross/master/docs/images/startup.jpg)
+
+![Result in Browser](https://raw.githubusercontent.com/minlia-projects/minlia-cross/master/docs/images/result.jpg)
 
 ### 特别感谢
 
