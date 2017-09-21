@@ -1,4 +1,4 @@
-### Minlia Cross 启动应用立即提供外部域名方式的网络请求
+### Minlia Cross 使用NGROK提供外部域名访问
 
 ### 使用方式, 在当前项目中添加如下依赖即可
 
@@ -9,3 +9,11 @@
       <version>1.0.2.RELEASE</version>
     </dependency>
 ```
+
+### 特别感谢
+
+ngrok为我们提供这么好用的软件, 大大节省外网服务器的部署成本
+
+dosgo提供了java版本的底层实现
+
+
