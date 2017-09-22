@@ -6,9 +6,20 @@
     <dependency>
       <groupId>com.minlia.cross</groupId>
       <artifactId>minlia-cross</artifactId>
-      <version>1.0.2.RELEASE</version>
+      <version>1.0.4.RELEASE</version>
     </dependency>
 ```
+
+### 演示项目(基于spring boot 官方项目 https://start.spring.io/starter.zip )
+ 
+git clone https://github.com/minlia-projects/minlia-cross
+
+cd docs/demo
+mvn spring-boot:run
+
+
+
+
 ### 运行效果
 
 ![Startup](https://raw.githubusercontent.com/minlia-projects/minlia-cross/master/docs/images/startup.jpg)
