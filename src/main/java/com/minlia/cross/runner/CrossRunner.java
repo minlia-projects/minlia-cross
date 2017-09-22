@@ -1,5 +1,7 @@
 package com.minlia.cross.runner;
 
+import static com.minlia.cross.constant.Constant.DOMAIN;
+
 import com.minlia.cross.client.NgrokClient;
 import com.minlia.cross.holder.ServerPortHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -45,11 +47,13 @@ public class CrossRunner implements DisposableBean, Runnable {
       log.debug("Starting on port: {} from ServerPortHolder",localApplicationPort);
     }
 
+
+
 //    System.setProperty("https.protocols", "TLSv1.1");
     NgrokClient ngclient = new NgrokClient();
     //addtunnel
     ngclient.addTun("127.0.0.1", localApplicationPort, "http",
-        RandomStringUtils.randomAlphabetic(16).toLowerCase() + ".dev.minlia.com", "", 4443, "");
+        RandomStringUtils.randomAlphabetic(16).toLowerCase() + "."+DOMAIN, "", 4443, "");
 //		ngclient.addTun("127.0.0.1",80,"http","","",0,"");
     //start
     ngclient.start();

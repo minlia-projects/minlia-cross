@@ -1,5 +1,7 @@
 package com.minlia.cross.client;
 
+import static com.minlia.cross.constant.Constant.DOMAIN;
+
 import com.minlia.cross.message.MessageSender;
 import com.minlia.cross.thread.CmdThread;
 import java.io.IOException;
@@ -21,7 +23,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 @Slf4j
 public class NgrokClient {
 	
-	String serveraddr= "dev.minlia.com";
+	String serveraddr= DOMAIN;
 	int serverport=4443;
 	SSLSocket s;
 	SocketFactory sf=null;
@@ -68,7 +70,7 @@ public class NgrokClient {
 			//启动线程监听
 			new CmdThread(this,s).start();
 		} catch (IOException e) {
-			
+
 		}
 	
 	}

@@ -1,6 +1,8 @@
 package com.minlia.cross.runner;
 
 
+import static com.minlia.cross.constant.Constant.DOMAIN;
+
 import com.minlia.cross.client.NgrokClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -15,7 +17,7 @@ public class ngrok {
     NgrokClient ngclient = new NgrokClient();
     //addtunnel
     ngclient.addTun("127.0.0.1", 7719, "http",
-        RandomStringUtils.randomAlphabetic(16).toLowerCase() + ".dev.minlia.com", "", 4443, "");
+        RandomStringUtils.randomAlphabetic(16).toLowerCase() + "."+DOMAIN, "", 4443, "");
 //		ngclient.addTun("127.0.0.1",80,"http","","",0,"");
     //start
     ngclient.start();
