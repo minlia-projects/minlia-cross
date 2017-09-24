@@ -38,5 +38,9 @@ public class PingThread extends Thread {
       }
     }
 
+    if(!ngrokcli.trfalg){
+      this.interrupt();
+    }
+
   }
 }

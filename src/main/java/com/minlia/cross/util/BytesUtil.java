@@ -134,7 +134,7 @@ public class BytesUtil {
   }
 
   public static int bytesToInt(byte b[], int offset) {
-		/* 避免为空 */
+    /* 避免为空 */
     if (b == null) {
       return 0;
     }

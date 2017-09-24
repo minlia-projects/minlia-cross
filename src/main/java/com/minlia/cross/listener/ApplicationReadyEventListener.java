@@ -1,6 +1,7 @@
 package com.minlia.cross.listener;
 
 import com.minlia.cross.runner.CrossRunner;
+import java.util.concurrent.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -13,8 +14,11 @@ public class ApplicationReadyEventListener implements ApplicationListener<Applic
   @Autowired
   CrossRunner crossRunner;
 
+  @Autowired
+  Executor executor;
+
   @Override
   public void onApplicationEvent(ApplicationReadyEvent event) {
-    crossRunner.run();
+    executor.execute(crossRunner);
   }
 }

@@ -4,9 +4,12 @@ import static com.minlia.cross.constant.Constant.DOMAIN;
 
 import com.minlia.cross.client.NgrokClient;
 import com.minlia.cross.holder.ServerPortHolder;
+import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 
 @Slf4j
 public class CrossRunner implements DisposableBean, Runnable {
@@ -14,6 +17,9 @@ public class CrossRunner implements DisposableBean, Runnable {
 //  @Autowired
 //  private CrossProperties crossProperties;
 
+
+  @Autowired
+  TaskExecutor taskExecutor;
 
   private Thread thread;
   private volatile boolean someCondition;
@@ -50,20 +56,48 @@ public class CrossRunner implements DisposableBean, Runnable {
 
 
 //    System.setProperty("https.protocols", "TLSv1.1");
-    NgrokClient ngclient = new NgrokClient();
+     ngclient = new NgrokClient();
     //addtunnel
+    ngclient.setTaskExecutor(taskExecutor);
     ngclient.addTun("127.0.0.1", localApplicationPort, "http",
-        RandomStringUtils.randomAlphabetic(16).toLowerCase() + "."+DOMAIN, "", 4443, "");
+         DOMAIN, RandomStringUtils.randomAlphabetic(16).toLowerCase(), 4443, "");
 //		ngclient.addTun("127.0.0.1",80,"http","","",0,"");
     //start
-    ngclient.start();
+    taskExecutor.execute(ngclient);
+//    ngclient.start();
+
+    while (true) {
+      if (ngclient.lasttime + 30 < (System.currentTimeMillis() / 1000) && ngclient.lasttime > 0) {
+        log.debug("Check status with error");
+
+        ngclient.trfalg = false;
+        ngclient.stopNgrokClient();
+//        ngclient.tunnelinfos.clear();//
+//        try {
+//          Thread.sleep(10000);
+//        } catch (InterruptedException e) {
+//          e.printStackTrace();
+//        }
+        //reconnct
+        ngclient.trfalg = true;
+//        ngclient.start();
+        taskExecutor.execute(ngclient);
+      } else {
+        log.debug("Check status with OK");
+      }
+      try {
+        Thread.sleep(30000);
+      } catch (InterruptedException e) {
+//        e.printStackTrace();
+      }
+    }
 
   }
 
   @Override
   public void destroy() {
     someCondition = false;
-    ngclient.stop();
+    ngclient.stopNgrokClient();
   }
 
 }

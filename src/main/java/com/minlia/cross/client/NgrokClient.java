@@ -10,133 +10,158 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+import java.util.Set;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.core.task.TaskExecutor;
 
 @Slf4j
-public class NgrokClient {
-	
-	String serveraddr= DOMAIN;
-	int serverport=4443;
-	SSLSocket s;
-	SocketFactory sf=null;
-	public String ClientId = "";
-	public String localhost = "127.0.0.1";
-	public int localport = 7719;
-	public String protocol = "http";
-	public boolean  trfalg=true;
-	public long lasttime=0;
-	public String authtoken="";
-	public List<HashMap<String, String>> tunnels = new ArrayList<HashMap<String, String>>();  
-	
+public class NgrokClient extends Thread {
 
-	
-	public HashMap<String,HashMap<String, String>> tunnelinfos = new HashMap<String,HashMap<String, String>>();  	
-	
-	
-	 public NgrokClient(String serveraddr,int serverport,String authtoken, Boolean debug){
-		 this.serveraddr=serveraddr;
-		 this.serverport=serverport;
-	 }
-	
-	
 
-	public NgrokClient(){
-	}
-	
-	public void stop(){
-		try {
-			s.shutdownInput();;
-			s.shutdownOutput();
-			s.close();
+  private TaskExecutor taskExecutor;
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+  String serveraddr = DOMAIN;
+  int serverport = 4443;
+  SSLSocket sslSocket;
+  SocketFactory sf = null;
+  public String ClientId = "";
+  public String localhost = "127.0.0.1";
+  public int localport = 7719;
+  public String protocol = "http";
+  public boolean trfalg = true;
+  public long lasttime = 0;
+  public String authtoken = "";
+  public List<HashMap<String, String>> tunnels = new ArrayList<HashMap<String, String>>();
 
-	}
-	public void start(){
-		s=connectSSL();
-		// 发送登录认证
-		try {
-			MessageSender.SendAuth("",authtoken,s.getOutputStream());
-			//启动线程监听
-			new CmdThread(this,s).start();
-		} catch (IOException e) {
 
-		}
-	
-	}
-	
-	
-	 public void addTun(String localhost, int localport,String Protocol,String Hostname,String Subdomain,int RemotePort,String HttpAuth){
-			
-			HashMap<String, String> tunelInfo = new HashMap<String, String>();
-			tunelInfo.put("localhost", localhost);
-			tunelInfo.put("localport", localport+"");
-			tunelInfo.put("Protocol", Protocol);
-			tunelInfo.put("Hostname", Hostname);
-			tunelInfo.put("Subdomain", Subdomain);
-			tunelInfo.put("HttpAuth", HttpAuth);
-			tunelInfo.put("RemotePort", RemotePort+"");
-			tunnels.add(tunelInfo);
-			
-	 }
-	
+  public HashMap<String, HashMap<String, String>> tunnelinfos = new HashMap<String, HashMap<String, String>>();
 
-	/*
-	 * 
-	 */
-	public  SSLSocket  connectSSL(){
-		SSLSocket s=null;
-		if(sf==null){
-			try {
-				sf=trustAllSocketFactory();
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-		try {
-			s = (SSLSocket) sf.createSocket(this.serveraddr, this.serverport);
-		    s.startHandshake();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return s;
-	}
-	
-	
-	/*忽略证书*/
-	public static SSLSocketFactory trustAllSocketFactory() throws Exception{
-	    TrustManager[] trustAllCerts = new TrustManager[]{
-	            new X509TrustManager() {
-	                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-	                    return null;
-	                }
+  public TaskExecutor getTaskExecutor() {
+    return taskExecutor;
+  }
 
-	                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-	                }
+  public void setTaskExecutor(TaskExecutor taskExecutor) {
+    this.taskExecutor = taskExecutor;
+  }
 
-	                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-	                }
+  public NgrokClient(String serveraddr, int serverport, String authtoken, Boolean debug) {
+    this.serveraddr = serveraddr;
+    this.serverport = serverport;
+  }
 
-	            }
-	    };
-	    SSLContext sslCxt = SSLContext.getInstance("TLSv1.2");
-	    sslCxt.init(null, trustAllCerts, null);
-	    return sslCxt.getSocketFactory();
-	}
+
+  public NgrokClient() {
+  }
+
+  public void stopNgrokClient() {
+    try {
+      trfalg=false;
+//      sslSocket.shutdownInput();
+//      sslSocket.shutdownOutput();
+      sslSocket.close();
+      interrupt();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  public void run() {
+    sslSocket = connectSSL();
+    // 发送登录认证
+    try {
+      MessageSender.SendAuth("", authtoken, sslSocket.getOutputStream());
+      //启动线程监听
+      CmdThread cmdThread=new CmdThread(this, sslSocket);
+      taskExecutor.execute(cmdThread);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+
+  }
+
+
+  public void addTun(String localhost, int localport, String Protocol, String Hostname,
+      String Subdomain, int RemotePort, String HttpAuth) {
+
+    HashMap<String, String> tunelInfo = new HashMap<String, String>();
+    tunelInfo.put("localhost", localhost);
+    tunelInfo.put("localport", localport + "");
+    tunelInfo.put("Protocol", Protocol);
+    tunelInfo.put("Hostname", Hostname);
+    tunelInfo.put("Subdomain", Subdomain);
+    tunelInfo.put("HttpAuth", HttpAuth);
+    tunelInfo.put("RemotePort", RemotePort + "");
+    tunnels.add(tunelInfo);
+
+  }
+
+
+  /*
+   *
+   */
+  public SSLSocket connectSSL() {
+    SSLSocket sslSocket1=null;
+    if (sf == null) {
+      try {
+        sf = trustAllSocketFactory();
+      } catch (Exception e1) {
+        e1.printStackTrace();
+      }
+    }
+
+    try {
+      sslSocket1 = (SSLSocket) sf.createSocket(this.serveraddr, this.serverport);
+    } catch (UnknownHostException e) {
+      log.debug("Error with UnknownHostException {}",e.getMessage());
+    } catch (IOException e) {
+      log.debug("Error with IOException {}",e.getMessage());
+    }
+
+    try {
+      sslSocket1.startHandshake();
+    } catch (SSLHandshakeException e) {
+      log.debug("Error with SSLHandshakeException {}",e.getMessage());
+    } catch (IOException e) {
+      log.debug("Error with IOException {}",e.getMessage());
+    }
+
+    sslSocket=sslSocket1;
+
+    return sslSocket;
+  }
+
+
+
+
+
+  /*忽略证书*/
+  public static SSLSocketFactory trustAllSocketFactory() throws Exception {
+    TrustManager[] trustAllCerts = new TrustManager[]{
+        new X509TrustManager() {
+          public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            return null;
+          }
+
+          public void checkClientTrusted(X509Certificate[] certs, String authType) {
+          }
+
+          public void checkServerTrusted(X509Certificate[] certs, String authType) {
+          }
+
+        }
+    };
+    SSLContext sslCxt = SSLContext.getInstance("TLSv1.2");
+    sslCxt.init(null, trustAllCerts, null);
+    return sslCxt.getSocketFactory();
+  }
 
 }
