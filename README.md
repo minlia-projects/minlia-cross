@@ -16,8 +16,24 @@
     <dependency>
       <groupId>com.minlia.cross</groupId>
       <artifactId>minlia-cross</artifactId>
-      <version>1.0.5.RELEASE</version>
+      <version>1.0.6.RELEASE</version>
     </dependency>
+```
+
+
+#### 使用服务器随机端口
+
+```
+server.port=0
+```
+
+#### 自定义二级域名
+
+application.properties里添加
+
+
+```
+minlia.cross.subdomain=will
 ```
 
 ### 演示项目(基于spring boot 官方项目 https://start.spring.io/starter.zip )
