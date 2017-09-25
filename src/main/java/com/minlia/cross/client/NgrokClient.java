@@ -33,7 +33,7 @@ public class NgrokClient extends Thread {
   SocketFactory sf = null;
   public String ClientId = "";
   public String localhost = "127.0.0.1";
-  public int localport = 7719;
+  public int localport = 8080;
   public String protocol = "http";
   public boolean trfalg = true;
   public long lasttime = 0;

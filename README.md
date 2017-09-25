@@ -36,6 +36,28 @@ application.properties里添加
 minlia.cross.subdomain=will
 ```
 
+
+### 默认配置
+
+```
+#让服务器动态分配一个端口
+server.port=0
+
+#指定固定二级域名
+minlia.cross.subdomain=will
+
+#指定固定一级域名
+#默认为以下配置
+# minlia.cross.remoteServer=dev.chinfan.io
+# minlia.cross.remotePort=4443
+# minlia.cross.localhost=127.0.0.1
+# minlia.cross.localPort=8080
+
+```
+
+
+
+
 ### 演示项目(基于spring boot 官方项目 https://start.spring.io/starter.zip )
 
 ```

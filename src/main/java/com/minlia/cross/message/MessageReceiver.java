@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.UUID;
 import javax.net.ssl.SSLSocket;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -68,6 +69,8 @@ public class MessageReceiver {
           NewTunnel(json);
         } else {
           log.debug("NewTunnel .....error....");
+          //由于加入了子域名可配置, 所以在无法绑定二级域名时直接抛出异常, 修改完二级域名后重新启动应用即可
+          throw new RuntimeException("申请新通道时出现问题,系统将退出");
         }
       }
 
@@ -138,7 +141,13 @@ public class MessageReceiver {
 
       ngrokcli.tunnelinfos.put(Payload.getString("Url"), ngrokcli.tunnelinfos.get(ReqId));
       ngrokcli.tunnelinfos.remove(ReqId);//remove
-      System.out.println("\r\nCross Access Address: " + Payload.getString("Url")+"\r\n");
+
+      String accessAddress=Payload.getString("Url");
+      if(!StringUtils.isEmpty(accessAddress)) {
+        System.out.println("\r\nCross Access Address: " + accessAddress + "\r\n");
+      }else{
+        System.err.println("\r\n无法获取访问地址, 是否使用了一个正在使用的二级域名, 请配置后重新启动应用\r\n");
+      }
 //          + "  Protocol:" + Payload.getString("Protocol"));
     } catch (JSONException e) {
       e.printStackTrace();

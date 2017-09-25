@@ -13,7 +13,32 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 public class CrossProperties {
 
+
+  /**
+   * 本地主机地址
+   */
+  private String localhost;
+
+  /**
+   * 本地端口
+   */
+  private Integer localPort;
+
+
+  /**
+   * 远程服务器地址
+   */
+  private String remoteServer;
+
+  /**
+   * 子域名
+   */
   private String subdomain;
+
+  /**
+   * 远程服务器端口, 默认为4443
+   */
+  private Integer remotePort;
 
 
 }

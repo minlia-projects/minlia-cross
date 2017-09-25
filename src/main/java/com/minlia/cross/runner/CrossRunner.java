@@ -36,24 +36,13 @@ public class CrossRunner implements DisposableBean, Runnable {
   @Override
   public void run() {
 
-    Integer port=0;
+    Integer localPort=8080;
 
-    Integer localApplicationPort=8080;
 
-    //先从服务器上下文中取得端口
-
-    //再从配置文件中取端口
-//    port=crossProperties.getPort();
-//    if(null!=port && port> 80 && port < 65535){
-//      localApplicationPort=port;
-//
-//      log.debug("Starting on port: {} from properties",localApplicationPort);
-//    }
-
-    port= ServerPortHolder.getPort();
-    if(null!=port && port> 80 && port < 65535){
-      localApplicationPort=port;
-      log.debug("Starting on port: {} from ServerPortHolder",localApplicationPort);
+    Integer port= ServerPortHolder.getPort();
+    if(null!=port && 0!=port && port> 80 && port < 65535){
+      localPort=port;
+      log.debug("Starting on port: {} from ServerPortHolder",localPort);
     }
 
 
@@ -62,12 +51,36 @@ public class CrossRunner implements DisposableBean, Runnable {
       subdomain= RandomStringUtils.randomAlphabetic(16);
     }
 
+
+    String remoteServer=crossProperties.getRemoteServer();
+    if(StringUtils.isEmpty(remoteServer)){
+      remoteServer= DOMAIN;
+    }
+
+    Integer remotePort=crossProperties.getRemotePort();
+    if(null ==remotePort){
+      remotePort= 4443;
+    }
+
+
+    String localhost=crossProperties.getLocalhost();
+    if(StringUtils.isEmpty(localhost)){
+      localhost= "127.0.0.1";
+    }
+
+
+    Integer tmpPort =crossProperties.getLocalPort();
+    if(null != tmpPort){
+      localPort=tmpPort;
+    }
+
+
 //    System.setProperty("https.protocols", "TLSv1.1");
      ngclient = new NgrokClient();
     //addtunnel
     ngclient.setTaskExecutor(taskExecutor);
-    ngclient.addTun("127.0.0.1", localApplicationPort, "http",
-         DOMAIN, subdomain, 4443, "");
+    ngclient.addTun(localhost, localPort, "http",
+        remoteServer, subdomain, remotePort, "");
 //		ngclient.addTun("127.0.0.1",80,"http","","",0,"");
     //start
     taskExecutor.execute(ngclient);
