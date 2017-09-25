@@ -6,7 +6,7 @@
     <dependency>
       <groupId>com.minlia.cross</groupId>
       <artifactId>minlia-cross</artifactId>
-      <version>1.0.4.RELEASE</version>
+      <version>1.0.5.RELEASE</version>
     </dependency>
 ```
 
