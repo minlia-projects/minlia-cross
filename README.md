@@ -37,12 +37,11 @@ minlia.cross.subdomain=will
 ```
 
 ### 演示项目(基于spring boot 官方项目 https://start.spring.io/starter.zip )
- 
+
+```
 git clone https://github.com/minlia-projects/minlia-cross
-
-cd docs/demo
-mvn spring-boot:run
-
+cd docs/demo && mvn spring-boot:run
+```
 
 
 
