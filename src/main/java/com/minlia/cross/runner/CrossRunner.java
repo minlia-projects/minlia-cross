@@ -3,10 +3,12 @@ package com.minlia.cross.runner;
 import static com.minlia.cross.constant.Constant.DOMAIN;
 
 import com.minlia.cross.client.NgrokClient;
+import com.minlia.cross.config.CrossProperties;
 import com.minlia.cross.holder.ServerPortHolder;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -14,8 +16,9 @@ import org.springframework.core.task.TaskExecutor;
 @Slf4j
 public class CrossRunner implements DisposableBean, Runnable {
 
-//  @Autowired
-//  private CrossProperties crossProperties;
+  @Autowired
+  private CrossProperties crossProperties;
+
 
 
   @Autowired
@@ -54,13 +57,17 @@ public class CrossRunner implements DisposableBean, Runnable {
     }
 
 
+    String subdomain=crossProperties.getSubdomain();
+    if(StringUtils.isEmpty(subdomain)){
+      subdomain= RandomStringUtils.randomAlphabetic(16);
+    }
 
 //    System.setProperty("https.protocols", "TLSv1.1");
      ngclient = new NgrokClient();
     //addtunnel
     ngclient.setTaskExecutor(taskExecutor);
     ngclient.addTun("127.0.0.1", localApplicationPort, "http",
-         DOMAIN, RandomStringUtils.randomAlphabetic(16).toLowerCase(), 4443, "");
+         DOMAIN, subdomain, 4443, "");
 //		ngclient.addTun("127.0.0.1",80,"http","","",0,"");
     //start
     taskExecutor.execute(ngclient);

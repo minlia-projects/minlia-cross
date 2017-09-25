@@ -138,7 +138,7 @@ public class MessageReceiver {
 
       ngrokcli.tunnelinfos.put(Payload.getString("Url"), ngrokcli.tunnelinfos.get(ReqId));
       ngrokcli.tunnelinfos.remove(ReqId);//remove
-      System.out.println("Cross Access Address:" + Payload.getString("Url"));
+      System.out.println("\r\nCross Access Address: " + Payload.getString("Url")+"\r\n");
 //          + "  Protocol:" + Payload.getString("Protocol"));
     } catch (JSONException e) {
       e.printStackTrace();

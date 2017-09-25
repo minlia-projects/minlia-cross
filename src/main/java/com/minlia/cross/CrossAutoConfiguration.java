@@ -1,9 +1,11 @@
 package com.minlia.cross;
 
+import com.minlia.cross.config.CrossProperties;
 import com.minlia.cross.listener.ApplicationReadyEventListener;
 import com.minlia.cross.listener.CrossEmbeddedServletContainerInitializedEventListener;
 import com.minlia.cross.runner.CrossRunner;
 import java.util.concurrent.Executor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +18,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  */
 @EnableAsync(mode = AdviceMode.ASPECTJ, proxyTargetClass = true)
 @Configuration
+@EnableConfigurationProperties(CrossProperties.class)
 public class CrossAutoConfiguration {
 
   @Bean
