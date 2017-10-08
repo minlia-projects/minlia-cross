@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
@@ -25,7 +26,7 @@ import org.springframework.core.task.TaskExecutor;
 public class NgrokClient extends Thread {
 
 
-  private TaskExecutor taskExecutor;
+  private Executor taskExecutor;
 
   String serveraddr = DOMAIN;
   int serverport = 4443;
@@ -43,11 +44,11 @@ public class NgrokClient extends Thread {
 
   public HashMap<String, HashMap<String, String>> tunnelinfos = new HashMap<String, HashMap<String, String>>();
 
-  public TaskExecutor getTaskExecutor() {
+  public Executor getTaskExecutor() {
     return taskExecutor;
   }
 
-  public void setTaskExecutor(TaskExecutor taskExecutor) {
+  public void setTaskExecutor(Executor taskExecutor) {
     this.taskExecutor = taskExecutor;
   }
 

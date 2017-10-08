@@ -5,13 +5,18 @@ import static com.minlia.cross.constant.Constant.DOMAIN;
 import com.minlia.cross.client.NgrokClient;
 import com.minlia.cross.config.CrossProperties;
 import com.minlia.cross.holder.ServerPortHolder;
-import java.util.concurrent.Executor;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 
 @Slf4j
 public class CrossRunner implements DisposableBean, Runnable {
@@ -21,8 +26,30 @@ public class CrossRunner implements DisposableBean, Runnable {
 
 
 
-  @Autowired
-  TaskExecutor taskExecutor;
+  private   ScheduledExecutorService scheduledExecutorService;
+
+  private   Map<String, String> tokenMap = new LinkedHashMap<String, String>();
+  private   Map<String, ScheduledFuture<?>> futureMap = new HashMap<String, ScheduledFuture<?>>();
+
+  private   int poolSize = 2;
+
+  private   boolean daemon = Boolean.TRUE;
+
+  private   boolean initialized = Boolean.FALSE;
+
+  private   void initScheduledExecutorService() {
+    log.info("daemon:{},poolSize:{}", daemon, poolSize);
+    scheduledExecutorService = Executors.newScheduledThreadPool(poolSize, new ThreadFactory() {
+      @Override
+      public Thread newThread(Runnable runnable) {
+        Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+        // 设置守护线程
+        thread.setDaemon(daemon);
+        return thread;
+      }
+    });
+  }
+
 
   private Thread thread;
   private volatile boolean someCondition;
@@ -36,8 +63,9 @@ public class CrossRunner implements DisposableBean, Runnable {
   @Override
   public void run() {
 
-    Integer localPort=8080;
+    initScheduledExecutorService();
 
+    Integer localPort=8080;
 
     Integer port= ServerPortHolder.getPort();
     if(null!=port && 0!=port && port> 80 && port < 65535){
@@ -78,12 +106,13 @@ public class CrossRunner implements DisposableBean, Runnable {
 //    System.setProperty("https.protocols", "TLSv1.1");
      ngclient = new NgrokClient();
     //addtunnel
-    ngclient.setTaskExecutor(taskExecutor);
+    ngclient.setTaskExecutor(scheduledExecutorService);
     ngclient.addTun(localhost, localPort, "http",
         remoteServer, subdomain, remotePort, "");
 //		ngclient.addTun("127.0.0.1",80,"http","","",0,"");
     //start
-    taskExecutor.execute(ngclient);
+    scheduledExecutorService.execute(ngclient);
+//    taskExecutor.execute(ngclient);
 //    ngclient.start();
 
     while (true) {
@@ -101,7 +130,7 @@ public class CrossRunner implements DisposableBean, Runnable {
         //reconnct
         ngclient.trfalg = true;
 //        ngclient.start();
-        taskExecutor.execute(ngclient);
+        scheduledExecutorService.execute(ngclient);
       } else {
         log.debug("Check status with OK");
       }
