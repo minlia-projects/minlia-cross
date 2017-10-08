@@ -1,6 +1,6 @@
 ### 更新日志
 
-1.0.8.RELEASE
+1.0.9.RELEASE
 修复与SPRING现有项目集成时任务执行器的问题
 
 1.0.6.RELEASE
@@ -19,7 +19,7 @@
     <dependency>
       <groupId>com.minlia.cross</groupId>
       <artifactId>minlia-cross</artifactId>
-      <version>1.0.8.RELEASE</version>
+      <version>1.0.9.RELEASE</version>
     </dependency>
 ```
 
