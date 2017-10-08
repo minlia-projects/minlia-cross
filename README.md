@@ -1,5 +1,8 @@
 ### 更新日志
 
+1.0.8.RELEASE
+修复与SPRING现有项目集成时任务执行器的问题
+
 1.0.6.RELEASE
 添加可以自定义二级域名的功能
 
@@ -16,7 +19,7 @@
     <dependency>
       <groupId>com.minlia.cross</groupId>
       <artifactId>minlia-cross</artifactId>
-      <version>1.0.6.RELEASE</version>
+      <version>1.0.8.RELEASE</version>
     </dependency>
 ```
 
@@ -33,7 +36,7 @@ application.properties里添加
 
 
 ```
-minlia.cross.subdomain=will
+minlia.cross.subdomain=willv8
 ```
 
 
@@ -44,7 +47,7 @@ minlia.cross.subdomain=will
 server.port=0
 
 #指定固定二级域名
-minlia.cross.subdomain=will
+minlia.cross.subdomain=随机分配的二级域名
 
 #指定固定一级域名
 #默认为以下配置
