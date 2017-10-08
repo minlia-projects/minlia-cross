@@ -26,30 +26,16 @@ public class CrossRunner implements DisposableBean, Runnable {
 
 
 
-  private   ScheduledExecutorService scheduledExecutorService;
+  private ScheduledExecutorService scheduledExecutorService;
 
-  private   Map<String, String> tokenMap = new LinkedHashMap<String, String>();
-  private   Map<String, ScheduledFuture<?>> futureMap = new HashMap<String, ScheduledFuture<?>>();
-
-  private   int poolSize = 2;
-
-  private   boolean daemon = Boolean.TRUE;
-
-  private   boolean initialized = Boolean.FALSE;
-
-  private   void initScheduledExecutorService() {
-    log.info("daemon:{},poolSize:{}", daemon, poolSize);
-    scheduledExecutorService = Executors.newScheduledThreadPool(poolSize, new ThreadFactory() {
-      @Override
-      public Thread newThread(Runnable runnable) {
-        Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-        // 设置守护线程
-        thread.setDaemon(daemon);
-        return thread;
-      }
-    });
+  public ScheduledExecutorService getScheduledExecutorService() {
+    return scheduledExecutorService;
   }
 
+  public void setScheduledExecutorService(
+      ScheduledExecutorService scheduledExecutorService) {
+    this.scheduledExecutorService = scheduledExecutorService;
+  }
 
   private Thread thread;
   private volatile boolean someCondition;
@@ -63,7 +49,6 @@ public class CrossRunner implements DisposableBean, Runnable {
   @Override
   public void run() {
 
-    initScheduledExecutorService();
 
     Integer localPort=8080;
 
